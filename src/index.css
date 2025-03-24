@@ -3,9 +3,9 @@
 @theme {
   --color-theme: var(--color-sky-500);
   --color-lightGray: var(--color-zinc-50);
+  --color-gray: var(--color-zinc-500);
   --color-border: var(--color-zinc-200);
   --color-bg: var(--color-white);
-  --color-gray: var(--color-gray-500);
 }
 
 @layer base {
@@ -18,7 +18,7 @@
   }
 
   button {
-    @apply bg-lightGray rounded p-2.5 h-10 cursor-pointer active:scale-98 focus:opacity-80 active:opacity-50 transition duration-75 justify-center items-center;
+    @apply bg-lightGray rounded p-2.5 h-10 cursor-pointer active:scale-98 focus:opacity-80 active:opacity-50 transition duration-75 flex justify-center items-center;
   }
 
   button.sd {

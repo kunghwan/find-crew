@@ -8,11 +8,11 @@ export interface TextInputProps {
   value: string | number;
   onChangeText: (value: string) => void;
 
-  //! div label 추가 스타일링
-
+  //! div, label 추가 스타일링
   divClassName?: string;
   labelClassName?: string;
-  //! input의 내용을 변경하고 싶을 떄 쓰면 되는 창구
+
+  //! input의 내용을 변경하고 싶을 때 쓰면 되는 창구
   props?: React.DetailedHTMLProps<
     React.InputHTMLAttributes<HTMLInputElement>,
     HTMLInputElement
@@ -21,6 +21,7 @@ export interface TextInputProps {
 
 const useTextInput = () => {
   const id = useId();
+
   const Component = useCallback(
     ({
       label,
@@ -32,7 +33,7 @@ const useTextInput = () => {
       props,
     }: TextInputProps) => {
       return (
-        <div className={twMerge("col gap-y-1", divClassName)}>
+        <div className={twMerge("col gapy-y-1", divClassName)}>
           <label
             htmlFor={id}
             className={twMerge("text-gray text-sm", labelClassName)}
@@ -41,13 +42,12 @@ const useTextInput = () => {
           </label>
           <input
             {...props}
-            type="text"
             id={id}
             value={value}
             onChange={(e) => onChangeText(e.target.value)}
             placeholder={placeholder}
             className={twMerge(
-              "border border-border bg-lightGray rounded h-1 px-2.5 focus:border-none focus:border-b focus:border-theme focus:rounded-none focus:bg-white outline-none foucs:border-l-0 foucs:border-r-0 trasition",
+              "border border-border bg-lightGray outline-none rounded h-10 px-2.5 focus:border-t-0 focus:border-l-0 focus:border-r-0 focus:border-b focus:border-b-theme focus:rounded-none focus:bg-white transition",
               props?.className
             )}
           />
@@ -57,7 +57,9 @@ const useTextInput = () => {
     [id]
   );
 
-  return { Component };
+  return {
+    Component,
+  };
 };
 
 export default useTextInput;
