@@ -1,18 +1,16 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
-import page from "./app/Home/page";
-import Authpage from "./app/Home/auth/page";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import HomePage from "./app/Home/page";
+import AuthPage from "./app/Auth/page";
 
-const App = () => {
+export default function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/">
-          <Route index Component={page} />
-          <Route path="auth" Component={Authpage} />
+          <Route index Component={HomePage} />
+          <Route path="auth" Component={AuthPage} />
         </Route>
       </Routes>
     </BrowserRouter>
   );
-};
-
-export default App;
+}

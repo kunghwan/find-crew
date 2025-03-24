@@ -5,6 +5,7 @@
   --color-lightGray: var(--color-zinc-50);
   --color-border: var(--color-zinc-200);
   --color-bg: var(--color-white);
+  --color-gray: var(--color-gray-500);
 }
 
 @layer base {
@@ -17,7 +18,7 @@
   }
 
   button {
-    @apply bg-lightGray rounded p-2.5 h-10 cursor-pointer active:scale-90 focus:opacity-80 active:opacity-50;
+    @apply bg-lightGray rounded p-2.5 h-10 cursor-pointer active:scale-98 focus:opacity-80 active:opacity-50 transition duration-75 justify-center items-center;
   }
 
   button.sd {
@@ -34,5 +35,9 @@
 
   .col {
     @apply flex flex-col;
+  }
+
+  ul.wrap {
+    @apply flex flex-wrap gap-2.5;
   }
 }
