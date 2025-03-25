@@ -31,3 +31,11 @@ interface TeamUserExLength {
   start: MonthYear;
   end: "현재까지" | MonthYear;
 }
+
+interface AsyncResult<T = any> {
+  success?: boolean;
+  message?: string;
+  data?: T;
+}
+
+type PromiseResult<T = any> = Promise<AsyncResult<T>>;
