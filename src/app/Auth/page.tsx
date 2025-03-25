@@ -1,4 +1,10 @@
-import { FormEvent, useCallback, useMemo, useState } from "react";
+import {
+  FormEvent,
+  useCallback,
+  useMemo,
+  useState,
+  useTransition,
+} from "react";
 import {
   useSearchParams,
   useNavigate,
@@ -12,8 +18,8 @@ import useSelect from "../../components/ui/useSelect";
 import { emailValidator } from "../../utils/validator";
 import ExForm from "./ExForm";
 import ExItem from "./ExItem";
-
-import Loading from "../../components/ui/Loading";
+import { CgSpinner } from "react-icons/cg";
+import Loading from "../../components/Loading";
 import { AUTH } from "../../context/hooks";
 import { FcGoogle } from "react-icons/fc";
 
@@ -32,7 +38,6 @@ export default function AuthPage() {
   const [isWithProvider, setIsWithProvider] = useState<undefined | string>(
     undefined
   );
-
   const [teamUser, setTeamUser] = useState(initialState);
   const [targets, setTargets] = useState(
     import.meta.env.DEV ? initialState.targets : extractor(params)
@@ -126,8 +131,8 @@ export default function AuthPage() {
   }, [nameMessage, mobileMessage, emailMessage, passwordMessage, teamUser]);
 
   // const [isPending, startTransition] = useTransition();
+  const { isPending, signup, signinWithProvider } = AUTH.use();
 
-  const { isPending, signup, signInWithProvider } = AUTH.use();
   const onSubmit = useCallback(
     async (e: FormEvent) => {
       e.preventDefault();
@@ -190,7 +195,11 @@ export default function AuthPage() {
           if (!success) {
             return alert(message);
           }
-          alert(isWithProvider ? "회원정보가 업데이트 되었습니다" : ``);
+          alert(
+            isWithProvider
+              ? "회원정보가 업데이트 되었습니다."
+              : `${teamUser.name} 님 회원가입을 진심으로 축하드립니다.`
+          );
           navi("/my");
           return console.log(teamUser.intro);
       }
@@ -212,6 +221,7 @@ export default function AuthPage() {
       Mobile,
       mobileMessage,
       goodToGo,
+      signup,
       password,
     ]
   );
@@ -432,18 +442,17 @@ export default function AuthPage() {
               : "다음"}
           </button>
         </div>
-
         {!isWithProvider && (
           <div className="col gap-y-2.5">
-            <span className="w-full block  text-center mt-5">OR</span>
-            <Link to={"/login"} className="primary w-full " type="button">
+            <span className="w-full block text-center mt-5">OR</span>
+            <Link to={"/login"} type="button" className="primary w-full">
               로그인하기
             </Link>
             <button
-              className="w-full gap-x-2.5 "
               type="button"
+              className="w-full gap-x-2.5"
               onClick={async () => {
-                const { success, message, data } = await signInWithProvider();
+                const { success, message, data } = await signinWithProvider();
                 if (!success) {
                   alert(message);
                   if (message?.includes("통합회원")) {
@@ -452,23 +461,24 @@ export default function AuthPage() {
                   if (!data) {
                     return;
                   }
-                }
-                const { displayName, phoneNumber, uid } = data;
-                setTeamUser((prev) => ({
-                  ...prev,
-                  name: displayName ?? "",
-                  mobile: phoneNumber ?? "010",
-                }));
-                setIsWithProvider(uid);
-                if (!phoneNumber) {
-                  navi("/auth?content=기본정보");
-                  Mobile.focus();
-                } else {
-                  navi("/auth?content=경력");
-                }
-                if (!displayName) {
-                  navi("/auth?content=기본정보");
-                  Name.focus();
+                  const { displayName, phoneNumber, uid } = data;
+                  setTeamUser((prev) => ({
+                    ...prev,
+                    name: displayName ?? "",
+                    mobile: phoneNumber ?? "010",
+                  }));
+                  setIsWithProvider(uid);
+                  if (!phoneNumber) {
+                    navi("/auth?content=기본정보");
+                    Mobile.focus();
+                  } else {
+                    navi("/auth?cotent=경력");
+                  }
+                  if (!displayName) {
+                    navi("/auth?content=기본정보");
+                    Name.focus();
+                  }
+                  return;
                 }
               }}
             >

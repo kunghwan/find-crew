@@ -119,17 +119,18 @@ const ExForm = ({ onCancel, onChange, payload }: ExFormProps) => {
         return res;
       };
       if (
-        payload.name === ex.name &&
-        payload.length.start.year === ex.length.start.year &&
-        payload.length.start.month &&
-        payload.length.end === "현재까지" &&
-        ex.length.end === "현재까지" &&
-        typeof payload.length.end !== "string" &&
-        typeof ex.length.end !== "string" &&
-        payload.length.end &&
-        !isDescDiff()
+        (payload.name === ex.name &&
+          payload.length.start.year === ex.length.start.year &&
+          payload.length.start.month === ex.length.start.month &&
+          payload.length.end === "현재까지" &&
+          ex.length.end === "현재까지") ||
+        (typeof payload.length.end !== "string" &&
+          typeof ex.length.end !== "string" &&
+          payload.length.end.year === ex.length.end.year &&
+          payload.length.end.month === ex.length.end.month &&
+          !isDescDiff())
       ) {
-        return alert("변경사항이 없습니다");
+        return alert("변경사항이 없습니다.");
       }
     }
 
@@ -321,7 +322,7 @@ const ExForm = ({ onCancel, onChange, payload }: ExFormProps) => {
               }
               const found = ex.descs.find((item) => item === desc);
               if (found) {
-                return alert("중복된 경력 사항입니다");
+                return alert("중복된 경력 사항입니다.");
               }
               setEx((prev) => ({ ...prev, descs: [...prev.descs, desc] }));
               setDesc("");
@@ -329,6 +330,7 @@ const ExForm = ({ onCancel, onChange, payload }: ExFormProps) => {
             }
           },
         }}
+        // resetHidden
       />
 
       {ex.descs.length > 0 && (
