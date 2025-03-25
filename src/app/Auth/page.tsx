@@ -190,7 +190,7 @@ export default function AuthPage() {
           if (!success) {
             return alert(message);
           }
-          alert(`${teamUser.name}님 회원가입 진심 축하`);
+          alert(isWithProvider ? "회원정보가 업데이트 되었습니다" : ``);
           navi("/my");
           return console.log(teamUser.intro);
       }
