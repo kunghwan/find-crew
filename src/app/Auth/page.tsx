@@ -1,4 +1,4 @@
-import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { FormEvent, useCallback, useMemo, useState } from "react";
 import {
   useSearchParams,
   useNavigate,
@@ -12,7 +12,8 @@ import useSelect from "../../components/ui/useSelect";
 import { emailValidator } from "../../utils/validator";
 import ExForm from "./ExForm";
 import ExItem from "./ExItem";
-import Loading from "../../components/Loading";
+
+import Loading from "../../components/ui/Loading";
 import { AUTH } from "../../context/hooks";
 import { FcGoogle } from "react-icons/fc";
 import { PROVIDER } from "../../context/zustand.store";
@@ -29,8 +30,10 @@ export default function AuthPage() {
     return split.splice(0, 2) as TeamUserJob[];
   };
 
-  const { email, name, uid, isWithProvider, setWithProvider } =
-    PROVIDER.store();
+  const [isWithProvider, setIsWithProvider] = useState<undefined | string>(
+    undefined
+  );
+
   const [teamUser, setTeamUser] = useState(initialState);
   const [targets, setTargets] = useState(
     import.meta.env.DEV ? initialState.targets : extractor(params)
@@ -461,25 +464,23 @@ export default function AuthPage() {
                   if (!data) {
                     return;
                   }
-                  const { displayName, phoneNumber, uid, email } = data;
-                  setTeamUser((prev) => ({
-                    ...prev,
-                    name: displayName ?? "",
-                    mobile: phoneNumber ?? "010",
-                    email: email ?? "",
-                  }));
-                  setWithProvider(uid, email!, name ?? undefined);
-                  if (!phoneNumber) {
-                    navi("/auth?content=기본정보");
-                    Mobile.focus();
-                  } else {
-                    navi("/auth?cotent=경력");
-                  }
-                  if (!displayName) {
-                    navi("/auth?content=기본정보");
-                    Name.focus();
-                  }
-                  return;
+                }
+                const { displayName, phoneNumber, uid } = data;
+                setTeamUser((prev) => ({
+                  ...prev,
+                  name: displayName ?? "",
+                  mobile: phoneNumber ?? "010",
+                }));
+                setIsWithProvider(uid);
+                if (!phoneNumber) {
+                  navi("/auth?content=기본정보");
+                  Mobile.focus();
+                } else {
+                  navi("/auth?content=경력");
+                }
+                if (!displayName) {
+                  navi("/auth?content=기본정보");
+                  Name.focus();
                 }
               }}
             >

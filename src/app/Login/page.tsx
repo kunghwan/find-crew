@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { PROVIDER } from "../../context/zustand.store";
 
 const LoginPage = () => {
+<<<<<<< HEAD
   const { signin, signinWithProvider } = AUTH.use();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -123,6 +124,9 @@ const LoginPage = () => {
       </div>
     </div>
   );
+=======
+  return <div>LoginPage</div>;
+>>>>>>> 088e484b8d3b026c146914774c496251e1979299
 };
 
 export default LoginPage;
