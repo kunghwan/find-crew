@@ -67,11 +67,7 @@ const AuthProvider = ({ children }: PropsWithChildren) => {
   );
 
   const signin = useCallback(
-<<<<<<< HEAD
     (email: string, password: string): PromiseResult<firebase.User> =>
-=======
-    (email: string, password: string): PromiseResult =>
->>>>>>> 088e484b8d3b026c146914774c496251e1979299
       new Promise((resolve) =>
         startTransition(async () => {
           try {
@@ -82,7 +78,6 @@ const AuthProvider = ({ children }: PropsWithChildren) => {
             if (!result.user) {
               return resolve({ message: "No Such User" });
             }
-<<<<<<< HEAD
             const snap = await ref.doc(result.user.uid).get();
             const data = snap.data() as TeamUser;
             if (!data) {
@@ -92,8 +87,6 @@ const AuthProvider = ({ children }: PropsWithChildren) => {
               });
             }
 
-=======
->>>>>>> 088e484b8d3b026c146914774c496251e1979299
             // await fetchUser(result.user.uid);
             resolve({ success: true });
           } catch (error: any) {
@@ -124,14 +117,10 @@ const AuthProvider = ({ children }: PropsWithChildren) => {
               id = uid;
             }
 
-<<<<<<< HEAD
             const updatedUser: TeamUser = { ...newUser, uid: id };
             await ref.doc(id).set(updatedUser);
             setUser(updatedUser);
 
-=======
-            await ref.doc(id).set({ ...newUser, uid: id } as TeamUser);
->>>>>>> 088e484b8d3b026c146914774c496251e1979299
             resolve({ success: true });
           } catch (error: any) {
             resolve(error);
@@ -159,10 +148,7 @@ const AuthProvider = ({ children }: PropsWithChildren) => {
               setUser(data);
               return resolve({
                 message: "통합회원입니다. 기본정보를 입력해주세요.",
-<<<<<<< HEAD
                 success: true,
-=======
->>>>>>> 088e484b8d3b026c146914774c496251e1979299
               });
             }
 

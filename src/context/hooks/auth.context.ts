@@ -6,11 +6,7 @@ export interface Props {
   initialized: boolean;
   isPending: boolean;
 
-<<<<<<< HEAD
   signin: (email: string, password: string) => PromiseResult<firebase.User>;
-=======
-  signin: (email: string, password: string) => PromiseResult;
->>>>>>> 088e484b8d3b026c146914774c496251e1979299
   signout: () => PromiseResult;
   signup: (user: TeamUser, password: string, uid?: string) => PromiseResult;
 
