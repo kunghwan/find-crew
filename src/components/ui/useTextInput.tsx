@@ -12,9 +12,10 @@ export interface TextInputProps {
 
   onSubmitEditing?: () => void;
 
+  resetHidden?: boolean;
+
   //! div, label 추가 스타일링
   divClassName?: string;
-  resetHidden?: boolean;
   labelClassName?: string;
   messageClassName?: string;
 
@@ -44,8 +45,8 @@ const useTextInput = () => {
       props,
       message,
       messageClassName,
-      resetHidden,
       onSubmitEditing,
+      resetHidden,
     }: TextInputProps) => {
       return (
         <div className={twMerge("col gap-y-1", divClassName)}>
@@ -56,16 +57,15 @@ const useTextInput = () => {
             {label}
           </label>
           <div className="relative">
-            {resetHidden !== true && (
+            {!resetHidden && (
               <AiOutlineCloseCircle
-                className="absolute top-[50%] right-[10px] text-gray-500 cursor-pointer translate-y-[-50%] active:scale-98 transition duration-75 active:opacity-50"
+                className="absolute top-[50%] right-[10px] text-gray-500 cursor-pointer translate-y-[-50%] active:scale-95 active:opacity-50 transition duration-75"
                 onClick={() => {
                   onChangeText("");
                   focus();
                 }}
               />
             )}
-
             <input
               ref={ref}
               {...props}

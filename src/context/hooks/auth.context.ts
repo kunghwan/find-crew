@@ -1,17 +1,17 @@
 import { useContext, createContext } from "react";
-import { firebase } from "../../lib/firebase"; // Make sure firebase is imported correctly
+import { firebase } from "../../lib/firebase";
+
 export interface Props {
   user: TeamUser | null;
   initialized: boolean;
   isPending: boolean;
 
-  signin: (email: string, password: string) => PromiseResult;
-
-  signup: (user: TeamUser, password: string, uid?: string) => PromiseResult;
+  signin: (email: string, password: string) => PromiseResult<firebase.User>;
   signout: () => PromiseResult;
+  signup: (user: TeamUser, password: string, uid?: string) => PromiseResult;
 
   updateUser: (newUser: TeamUser) => PromiseResult;
-  signInWithProvider: () => PromiseResult<firebase.User>;
+  signinWithProvider: () => PromiseResult<firebase.User>;
 }
 
 export const initialState: Props = {
@@ -21,7 +21,7 @@ export const initialState: Props = {
   signout: async () => ({}),
   signup: async () => ({}),
   updateUser: async () => ({}),
-  signInWithProvider: async () => ({}),
+  signinWithProvider: async () => ({}),
   user: null,
 };
 

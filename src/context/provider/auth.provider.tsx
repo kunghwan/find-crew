@@ -9,61 +9,66 @@ import {
 } from "react";
 
 const ref = db.collection(FBCollection.USERS);
-
 const AuthProvider = ({ children }: PropsWithChildren) => {
-  const [user, setUser] = useState<TeamUser | null>(AUTH.initialState.user);
+  const [user, setUser] = useState(AUTH.initialState.user);
   const [initialized, setInitialized] = useState(false);
+
   const [isPending, startTransition] = useTransition();
 
-  // Fetch user data from the Firestore DB
-  const fetchUser = useCallback(async (uid: string) => {
-    try {
+  const fetchUser = useCallback((uid: string) => {
+    startTransition(async () => {
       const snap = await ref.doc(uid).get();
-      const data = snap.data() as TeamUser | undefined;
-      if (data) {
-        setUser(data);
+      const data = snap.data() as TeamUser;
+      if (!data) {
+        setUser(null);
       } else {
-        setUser(null); // Handle case where user doesn't exist in DB
+        setUser(data as TeamUser);
       }
-    } catch (error) {
-      console.error("Error fetching user:", error);
-      setUser(null); // Handle error and reset user state
-    }
+    });
   }, []);
 
-  // Set up auth state listener and fetch user data
   useEffect(() => {
+    //! Listener
     const subAuth = authService.onAuthStateChanged((fbUser) => {
       if (!fbUser) {
-        setUser(null); // No user is logged in
+        //! 유저가 없을 때의 로직
+        setUser(null);
       } else {
-        fetchUser(fbUser.uid); // Fetch user data when logged in
+        //! 유저 정보 가져오기
+        fetchUser(fbUser.uid);
       }
-      setInitialized(true); // Set initialized to true once auth state changes
+      setTimeout(() => {
+        setInitialized(true);
+      }, 2000);
     });
 
-    return () => subAuth(); // Clean up the subscription on component unmount
+    subAuth;
+    return subAuth;
   }, [fetchUser]);
 
-  // Signout function
-  const signout = useCallback((): Promise<AsyncResult> => {
-    return new Promise<AsyncResult>((resolve, reject) => {
-      startTransition(async () => {
-        try {
-          await authService.signOut();
-          setUser(null); // Reset user state after signing out
-          resolve({ success: true });
-        } catch (error: any) {
-          reject({ message: error.message }); // Reject with error message if signout fails
-        }
-      });
-    });
-  }, []);
+  useEffect(() => {
+    console.log({ user });
+  }, [user]);
 
-  // Signin function
+  const signout = useCallback(
+    (): PromiseResult =>
+      new Promise((resolve) =>
+        startTransition(async () => {
+          try {
+            await authService.signOut();
+            setUser(null);
+            resolve({ success: true });
+          } catch (error: any) {
+            resolve(error);
+          }
+        })
+      ),
+    []
+  );
+
   const signin = useCallback(
-    (email: string, password: string): Promise<AsyncResult> => {
-      return new Promise<AsyncResult>((resolve, reject) => {
+    (email: string, password: string): PromiseResult<firebase.User> =>
+      new Promise((resolve) =>
         startTransition(async () => {
           try {
             const result = await authService.signInWithEmailAndPassword(
@@ -71,29 +76,30 @@ const AuthProvider = ({ children }: PropsWithChildren) => {
               password
             );
             if (!result.user) {
-              reject({ message: "No such user found" });
-              return;
+              return resolve({ message: "No Such User" });
             }
-            // Optionally fetch user data
+            const snap = await ref.doc(result.user.uid).get();
+            const data = snap.data() as TeamUser;
+            if (!data) {
+              return resolve({
+                message: "통합회원입니다. 간략한 정보를 입력해주세요.",
+                data: result.user,
+              });
+            }
+
             // await fetchUser(result.user.uid);
             resolve({ success: true });
           } catch (error: any) {
-            reject({ message: error.message }); // Reject with error message if signin fails
+            resolve(error);
           }
-        });
-      });
-    },
+        })
+      ),
     []
   );
 
-  // Signup function
   const signup = useCallback(
-    (
-      newUser: TeamUser,
-      password: string,
-      uid: string
-    ): Promise<AsyncResult> => {
-      return new Promise<AsyncResult>((resolve, reject) => {
+    (newUser: TeamUser, password: string, uid?: string): PromiseResult =>
+      new Promise((resolve) =>
         startTransition(async () => {
           try {
             let id = "";
@@ -102,29 +108,29 @@ const AuthProvider = ({ children }: PropsWithChildren) => {
                 newUser.email,
                 password
               );
+
               if (!result.user) {
-                reject({ message: "회원가입 실패" });
-                return;
+                return resolve({ message: "회원가입에 실패했습니다." });
               }
               id = result.user.uid;
             } else {
               id = uid;
             }
 
-            await ref
-              .doc(result.user.uid)
-              .set({ ...newUser, uid: result.user.uid } as TeamUser);
+            const updatedUser: TeamUser = { ...newUser, uid: id };
+            await ref.doc(id).set(updatedUser);
+            setUser(updatedUser);
+
             resolve({ success: true });
           } catch (error: any) {
-            reject({ message: error.message }); // Reject with error message if signup fails
+            resolve(error);
           }
-        });
-      });
-    },
+        })
+      ),
     []
   );
 
-  const signInWithProvider = useCallback(
+  const signinWithProvider = useCallback(
     async (): PromiseResult =>
       new Promise((resolve) =>
         startTransition(async () => {
@@ -139,17 +145,26 @@ const AuthProvider = ({ children }: PropsWithChildren) => {
             const snap = await ref.doc(result.user.uid).get();
             const data = snap.data() as TeamUser;
             if (data) {
-              return resolve({ message: "통합회원임. 기본정보 입력" });
+              setUser(data);
+              return resolve({
+                message: "통합회원입니다. 기본정보를 입력해주세요.",
+                success: true,
+              });
             }
 
-            resolve({ message: "기본정보를 입력해야함", data: result.user });
+            resolve({
+              message: "기본정보를 입력해야합니다.",
+              data: result.user,
+            });
           } catch (error: any) {
+            console.log({ error });
             resolve(error);
           }
         })
       ),
     []
   );
+
   return (
     <AUTH.Context.Provider
       value={{
@@ -159,7 +174,7 @@ const AuthProvider = ({ children }: PropsWithChildren) => {
         signin,
         signup,
         user,
-        signInWithProvider,
+        signinWithProvider,
       }}
     >
       {children}

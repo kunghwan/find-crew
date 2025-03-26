@@ -1,4 +1,4 @@
-import { FormEvent, useCallback, useMemo, useState } from "react";
+import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import {
   useSearchParams,
   useNavigate,
@@ -12,10 +12,10 @@ import useSelect from "../../components/ui/useSelect";
 import { emailValidator } from "../../utils/validator";
 import ExForm from "./ExForm";
 import ExItem from "./ExItem";
-
-import Loading from "../../components/ui/Loading";
+import Loading from "../../components/Loading";
 import { AUTH } from "../../context/hooks";
 import { FcGoogle } from "react-icons/fc";
+import { PROVIDER } from "../../context/zustand.store";
 
 export default function AuthPage() {
   const params = useSearchParams()[0].get("target");
@@ -29,10 +29,8 @@ export default function AuthPage() {
     return split.splice(0, 2) as TeamUserJob[];
   };
 
-  const [isWithProvider, setIsWithProvider] = useState<undefined | string>(
-    undefined
-  );
-
+  const { email, name, uid, isWithProvider, setWithProvider } =
+    PROVIDER.store();
   const [teamUser, setTeamUser] = useState(initialState);
   const [targets, setTargets] = useState(
     import.meta.env.DEV ? initialState.targets : extractor(params)
@@ -126,8 +124,8 @@ export default function AuthPage() {
   }, [nameMessage, mobileMessage, emailMessage, passwordMessage, teamUser]);
 
   // const [isPending, startTransition] = useTransition();
+  const { isPending, signup, signinWithProvider } = AUTH.use();
 
-  const { isPending, signup, signInWithProvider } = AUTH.use();
   const onSubmit = useCallback(
     async (e: FormEvent) => {
       e.preventDefault();
@@ -185,12 +183,16 @@ export default function AuthPage() {
           const { message, success } = await signup(
             teamUser,
             password,
-            isWithProvider
+            uid ?? undefined
           );
           if (!success) {
             return alert(message);
           }
-          alert(isWithProvider ? "회원정보가 업데이트 되었습니다" : ``);
+          alert(
+            isWithProvider
+              ? "회원정보가 업데이트 되었습니다."
+              : `${teamUser.name} 님 회원가입을 진심으로 축하드립니다.`
+          );
           navi("/my");
           return console.log(teamUser.intro);
       }
@@ -212,10 +214,17 @@ export default function AuthPage() {
       Mobile,
       mobileMessage,
       goodToGo,
+      signup,
       password,
+      uid,
     ]
   );
 
+  useEffect(() => {
+    if (isWithProvider && email) {
+      setTeamUser((prev) => ({ ...prev, name: name ?? "", email }));
+    }
+  }, [isWithProvider, name, email]);
   return (
     <div>
       {isPending && <Loading message="회원가입이 진행중입니다..." />}
@@ -432,43 +441,45 @@ export default function AuthPage() {
               : "다음"}
           </button>
         </div>
-
         {!isWithProvider && (
           <div className="col gap-y-2.5">
-            <span className="w-full block  text-center mt-5">OR</span>
-            <Link to={"/login"} className="primary w-full " type="button">
+            <span className="w-full block text-center mt-5">OR</span>
+            <Link to={"/login"} type="button" className="primary w-full">
               로그인하기
             </Link>
             <button
-              className="w-full gap-x-2.5 "
               type="button"
+              className="w-full gap-x-2.5"
               onClick={async () => {
-                const { success, message, data } = await signInWithProvider();
+                const { success, message, data } = await signinWithProvider();
                 if (!success) {
                   alert(message);
                   if (message?.includes("통합회원")) {
                     navi("/my/account");
                   }
+
                   if (!data) {
                     return;
                   }
-                }
-                const { displayName, phoneNumber, uid } = data;
-                setTeamUser((prev) => ({
-                  ...prev,
-                  name: displayName ?? "",
-                  mobile: phoneNumber ?? "010",
-                }));
-                setIsWithProvider(uid);
-                if (!phoneNumber) {
-                  navi("/auth?content=기본정보");
-                  Mobile.focus();
-                } else {
-                  navi("/auth?content=경력");
-                }
-                if (!displayName) {
-                  navi("/auth?content=기본정보");
-                  Name.focus();
+                  const { displayName, phoneNumber, uid, email } = data;
+                  setTeamUser((prev) => ({
+                    ...prev,
+                    name: displayName ?? "",
+                    mobile: phoneNumber ?? "010",
+                    email: email ?? "",
+                  }));
+                  setWithProvider(uid, email!, name ?? undefined);
+                  if (!phoneNumber) {
+                    navi("/auth?content=기본정보");
+                    Mobile.focus();
+                  } else {
+                    navi("/auth?cotent=경력");
+                  }
+                  if (!displayName) {
+                    navi("/auth?content=기본정보");
+                    Name.focus();
+                  }
+                  return;
                 }
               }}
             >
