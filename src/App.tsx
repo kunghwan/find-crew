@@ -11,7 +11,10 @@ const MyPage = lazy(() => import("./app/My/page"));
 const AccountPage = lazy(() => import("./app/My/Account/page"));
 const FindPage = lazy(() => import("./app/Find/page"));
 const FindDetailPage = lazy(() => import("./app/Find/[id]/page"));
-const NewMatchingTeam = lazy(() => import("./app/Find/NewMatchingTeam/page"));
+const NewMatchingTeamPage = lazy(
+  () => import("./app/Find/NewMatchingTeam/page")
+);
+const ChatPage = lazy(() => import("./app/Find/[id]/chat/page"));
 
 export default function App() {
   const { initialized, user } = AUTH.use();
@@ -33,12 +36,19 @@ export default function App() {
               <Route path="find">
                 <Route index Component={FindPage} />
 
-                <Route path=":id" Component={FindDetailPage} />
+                <Route path=":id">
+                  <Route index Component={FindDetailPage} />
+                  {user && (
+                    <Route path="chat" element={<ChatPage {...user} />} />
+                  )}
+                </Route>
                 {user && (
-                  <Route
-                    path="matching-teams"
-                    element={<NewMatchingTeam {...user} />}
-                  />
+                  <>
+                    <Route
+                      path="matching-teams"
+                      element={<NewMatchingTeamPage {...user} />}
+                    />
+                  </>
                 )}
               </Route>
 

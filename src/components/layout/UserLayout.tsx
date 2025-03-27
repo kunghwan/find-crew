@@ -47,7 +47,7 @@ const UserLayout = ({ user }: { user: TeamUser | null }) => {
           </Link>
           <div className="row gap-x-2.5">
             {pathname === "/find" && (
-              <Link to="/find/matching-teams">공구등록</Link>
+              <Link to="/find/matching-teams">공고등록</Link>
             )}
             <button
               onClick={() => setIsMenuShowing((prev) => !prev)}

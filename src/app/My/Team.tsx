@@ -45,37 +45,27 @@ const Team = (user: TeamUser) => {
   }
 
   return (
-    <div>
+    <div className="p-5">
       <h1>매칭 진행 중인 팀 {data.length}개</h1>
-      <ul>
+      <ul className="col gap-y-2.5 my-5">
         {data.map((team) => (
           <li key={team.id}>
-            {team.name}
-            {team.members.length}명의 멤버
-            {team.targets.length}의 직군을 구함
+            <Link
+              to={
+                `/find/${team.id}/chat${team.uid === user.uid ? "" : user.uid}`
+
+                // team.uid === user.uid
+                //   ? `/find/${team.id}/chat`
+                //   : `/find/${team.id}/chat?cid=${user.uid}`
+              }
+            >
+              <b>[{team.name}]</b>
+              {team.targets.length}개의 직군을 찾고 있음
+            </Link>
           </li>
         ))}
       </ul>
       <Link to={"/find"}>나의 팀 찾기</Link>
-      <button
-        onClick={async () => {
-          try {
-            const ref = db.collection(FBCollection.MATCHING);
-
-            for (const team of teams) {
-              const doc = await ref.add(team);
-              console.log(doc);
-              console.log(team.name, "공고 등록 완료");
-            }
-            console.log("데이터 업데이트 됨");
-          } catch (error: any) {
-            console.log(error);
-            alert(error.message);
-          }
-        }}
-      >
-        INIT
-      </button>
     </div>
   );
 };
