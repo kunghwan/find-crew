@@ -39,9 +39,12 @@ export default function App() {
                 <Route path=":id">
                   <Route index Component={FindDetailPage} />
                   {user && (
-                    <Route path="chat" element={<ChatPage {...user} />} />
+                    <Route path="chat">
+                      <Route index element={<ChatPage {...user} />} />
+                    </Route>
                   )}
                 </Route>
+
                 {user && (
                   <>
                     <Route

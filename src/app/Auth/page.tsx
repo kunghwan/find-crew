@@ -193,7 +193,7 @@ export default function AuthPage() {
               ? "회원정보가 업데이트 되었습니다."
               : `${teamUser.name} 님 회원가입을 진심으로 축하드립니다.`
           );
-          navi("/my");
+          navi("/my?content=matching");
           return console.log(teamUser.intro);
       }
     },

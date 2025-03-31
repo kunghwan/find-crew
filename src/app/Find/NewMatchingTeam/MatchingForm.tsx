@@ -11,7 +11,7 @@ import Loading from "../../../components/Loading";
 
 const initialState: MatchingTeam = {
   descs: [],
-  fid: "",
+  fid: [],
   id: "",
   intro: "",
   members: [],

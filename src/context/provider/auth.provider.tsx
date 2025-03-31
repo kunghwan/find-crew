@@ -46,10 +46,6 @@ const AuthProvider = ({ children }: PropsWithChildren) => {
     return subAuth;
   }, [fetchUser]);
 
-  useEffect(() => {
-    console.log({ user });
-  }, [user]);
-
   const signout = useCallback(
     (): PromiseResult =>
       new Promise((resolve) =>
@@ -165,6 +161,40 @@ const AuthProvider = ({ children }: PropsWithChildren) => {
     []
   );
 
+  const updateUser = useCallback(
+    async (newUser: TeamUser): PromiseResult =>
+      new Promise((resolve) =>
+        startTransition(async () => {
+          try {
+            await ref.doc(user?.uid).update(newUser);
+            setUser(newUser);
+            resolve({ success: true });
+          } catch (error: any) {
+            resolve(error);
+          }
+        })
+      ),
+    [user]
+  );
+
+  const updateUserDetail = useCallback(
+    async (target: keyof TeamUser, value: any): PromiseResult =>
+      new Promise((resolve) =>
+        startTransition(async () => {
+          try {
+            await ref.doc(user?.uid).update({ [target]: value });
+
+            setUser((prev) => (prev ? { ...prev, [target]: value } : prev));
+
+            resolve({ success: true });
+          } catch (error: any) {
+            resolve(error);
+          }
+        })
+      ),
+    [user]
+  );
+
   return (
     <AUTH.Context.Provider
       value={{
@@ -175,6 +205,8 @@ const AuthProvider = ({ children }: PropsWithChildren) => {
         signup,
         user,
         signinWithProvider,
+        updateUser,
+        updateUserDetail,
       }}
     >
       {children}

@@ -56,6 +56,8 @@ interface MatchingTeam {
   uid: string; //! 공고 올린사람의 아이디
   id: string; //! 공고 아이디 -> 추가, 수정, 삭제
   fid: string[]; //! 공고 보고 스크랩 또는 매칭 한 사람의 아이디
+  isFinished?: boolean;
+  fusers?: string[];
 }
 
 //Collection Chat
@@ -67,3 +69,9 @@ interface Chat {
   //? 예시) attachedFileUrl: string | null //! 추가로 원하는 타입 붙이면 됨
   id: string; //! 삭제할때 필요한 아이디
 }
+
+interface MatchedTeam extends MatchingTeam {
+  tid: string[];
+}
+
+type MutationAction = "CREATE" | "UPDATE" | "DELETE";
