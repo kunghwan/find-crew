@@ -9,7 +9,7 @@ const tel = "01012341234";
 const MyTeamItem = ({ item, onDelete }: MyTeamItemProp) => {
   const onText = useCallback(() => {
     const a = document.createElement("a");
-    a.href = `sms:${tel}&body=저한테 연락 부탁드려요.`;
+    a.href = `sms:${tel}${isAndroid ? "?" : "&"}body=저한테 연락 부탁드려요.`;
     a.click();
   }, []);
 

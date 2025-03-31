@@ -25,7 +25,7 @@ export default function App() {
           <h1 className="text-5xl">팀 매칭 앱</h1>
         </div>
       ) : (
-        <BrowserRouter>
+        <BrowserRouter basename={import.meta.env.DEV ? "/" : "/find-crew"}>
           <Routes>
             <Route path="/" element={<UserLayout user={user} />}>
               <Route index Component={HomePage} />
@@ -39,17 +39,14 @@ export default function App() {
                 <Route path=":id">
                   <Route index Component={FindDetailPage} />
                   {user && (
-                    <Route path="chat">
-                      <Route index element={<ChatPage {...user} />} />
-                    </Route>
+                    <Route path="chat" element={<ChatPage {...user} />} />
                   )}
                 </Route>
-
                 {user && (
                   <>
                     <Route
                       path="matching-teams"
-                      element={<NewMatchingTeamPage {...user} />}
+                      element={<NewMatchingTeamPage />}
                     />
                   </>
                 )}

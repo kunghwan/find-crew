@@ -7,9 +7,8 @@ import Loading from "../../../components/Loading";
 
 const AccountPage = (user: TeamUser) => {
   const [props, setProps] = useState(user);
-  const { updateUser, updateUserDetail, isPending } = AUTH.use();
-  const { email, experiences, intro, jobDesc, mobile, name, targets, uid } =
-    props;
+  const { updateUserDetail, isPending } = AUTH.use();
+  const { name } = props;
   const onChangeP = useCallback((target: keyof TeamUser, value: any) => {
     setProps((prev) => ({ ...prev, [target]: value }));
   }, []);
